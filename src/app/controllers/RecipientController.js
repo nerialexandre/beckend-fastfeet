@@ -4,7 +4,6 @@ import Recipient from '../models/Recipient';
 class RecipientController {
   async store(req, res) {
     const schema = Yup.object().shape({
-      id: Yup.string().required(),
       name: Yup.string().required(),
       street: Yup.string().required(),
       number: Yup.string().required(),
@@ -14,7 +13,7 @@ class RecipientController {
       cep: Yup.string().required(),
     });
     if (!(await schema.isValid(req.body))) {
-      res.status(400).json({ error: 'Preencha o formulario' });
+      return res.status(400).json({ error: 'Preencha o formulario' });
     }
     const recipient = await Recipient.create(req.body);
     return res.json(recipient);
@@ -34,7 +33,7 @@ class RecipientController {
       cep: Yup.string(),
     });
     if (!(await schema.isValid(req.body))) {
-      res.status(400).json({ error: 'Preencha o formulario' });
+      return res.status(400).json({ error: 'Preencha o formulario' });
     }
     const { id } = req.body;
 
@@ -44,7 +43,7 @@ class RecipientController {
     }
     const newRecipient = await recipient.update(req.body);
 
-    res.json(newRecipient);
+    return res.json(newRecipient);
   }
 }
 
