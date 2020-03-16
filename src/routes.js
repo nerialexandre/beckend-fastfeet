@@ -17,9 +17,8 @@ routes.post('/recipients', RecipientController.store);
 routes.put('/recipients', RecipientController.update);
 
 routes.post('/deliverymen', DeliverymanController.store);
-// routes.get('/deliverymen', DeliverymanController.index);
-
-// routes.put('/deliverymen/:id', DeliverymanController.update);
+routes.get('/deliverymen', DeliverymanController.index);
+routes.put('/deliverymen', DeliverymanController.update);
 // routes.delete('/deliverymen/:id', DeliverymanController.update);
 
 // upload de arquivos

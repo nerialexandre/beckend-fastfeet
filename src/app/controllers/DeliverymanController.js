@@ -14,13 +14,32 @@ class DeliverymanController {
     return res.json(deliveryman);
   }
 
-  // async index(req, res) {
-  //   return res.json();
-  // }
+  async index(req, res) {
+    const deliverymen = await Deliveryman.findAll({
+      order: ['name'],
+      attributes: ['id', 'name', 'avatar_id'],
+    });
+    if (!deliverymen) {
+      return res.json({ mensage: 'Nao existem Entregadores cadastrados' });
+    }
 
-  // async update(req, res) {
-  //   return res.json();
-  // }
+    return res.json(deliverymen);
+  }
+
+  async update(req, res) {
+    const { id } = req.body;
+    const deliveryman = await Deliveryman.findByPk(id);
+    console.log(deliveryman);
+    if (!deliveryman) {
+      return res.json({ mensage: 'Entregador nao foi encontrado' });
+    }
+    const { name, email } = await deliveryman.update(req.body);
+
+    return res.json({
+      name,
+      email,
+    });
+  }
 
   // async delete(req, res) {
   //   return res.json();
