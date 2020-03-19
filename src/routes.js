@@ -19,7 +19,7 @@ routes.put('/recipients', RecipientController.update);
 routes.post('/deliverymen', DeliverymanController.store);
 routes.get('/deliverymen', DeliverymanController.index);
 routes.put('/deliverymen', DeliverymanController.update);
-// routes.delete('/deliverymen/:id', DeliverymanController.update);
+routes.delete('/deliverymen/:id', DeliverymanController.delete);
 
 // upload de arquivos
 routes.post('/files', upload.single('file'), FileController.store);

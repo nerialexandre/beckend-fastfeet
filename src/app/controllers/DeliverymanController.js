@@ -29,7 +29,6 @@ class DeliverymanController {
   async update(req, res) {
     const { id } = req.body;
     const deliveryman = await Deliveryman.findByPk(id);
-    console.log(deliveryman);
     if (!deliveryman) {
       return res.json({ mensage: 'Entregador nao foi encontrado' });
     }
@@ -41,9 +40,16 @@ class DeliverymanController {
     });
   }
 
-  // async delete(req, res) {
-  //   return res.json();
-  // }
+  async delete(req, res) {
+    const deliveryman = await Deliveryman.findByPk(req.params.id);
+
+    if (!deliveryman) {
+      return res.json({ mensage: 'Entregador nao foi encontrado' });
+    }
+    await deliveryman.destroy();
+
+    return res.json();
+  }
 }
 
 export default new DeliverymanController();
