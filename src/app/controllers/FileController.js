@@ -1,4 +1,4 @@
-import Files from '../models/Files';
+import Files from '../models/File';
 
 class FileController {
   async store(req, res) {

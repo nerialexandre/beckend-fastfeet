@@ -3,7 +3,7 @@ import databaseConfig from '../config/database';
 import users from '../app/models/User';
 import Recipients from '../app/models/Recipient';
 import Deliverymen from '../app/models/Deliveryman';
-import Files from '../app/models/Files';
+import Files from '../app/models/File';
 
 const models = [users, Recipients, Files, Deliverymen];
 

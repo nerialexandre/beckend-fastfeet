@@ -27,8 +27,16 @@ class DeliverymanController {
   }
 
   async update(req, res) {
-    const { id } = req.body;
-    const deliveryman = await Deliveryman.findByPk(id);
+    const schema = Yup.object().shape({
+      name: Yup.string(),
+      email: Yup.string(),
+    });
+
+    if (!schema.isValid(req.body)) {
+      return res.status(400).json({ error: 'Preencha o id' });
+    }
+
+    const deliveryman = await Deliveryman.findByPk(req.params.id);
     if (!deliveryman) {
       return res.json({ mensage: 'Entregador nao foi encontrado' });
     }
