@@ -26,16 +26,16 @@ class Deliveries extends Model {
     return this;
   }
 
-  static associeate(models) {
+  static associate(models) {
     this.belongsTo(models.Recipients, {
       foreignKey: 'recipient_id',
-      as: 'recipient',
+      as: 'Recipients',
     });
     this.belongsTo(models.Deliverymen, {
       foreignKey: 'deliveryman_id',
-      as: 'deliveryman',
+      as: 'Deliverymen',
     });
-    this.belongsTo(models.Files, { foreignKey: 'signature_id', as: 'file' });
+    this.belongsTo(models.Files, { foreignKey: 'signature_id', as: 'Files' });
   }
 }
 

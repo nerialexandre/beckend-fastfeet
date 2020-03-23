@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import Recipient from '../models/Recipient';
+import Recipients from '../models/Recipients';
 
 class RecipientController {
   async store(req, res) {
@@ -15,7 +15,7 @@ class RecipientController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Preencha o formulario' });
     }
-    const recipient = await Recipient.create(req.body);
+    const recipient = await Recipients.create(req.body);
     return res.json(recipient);
   }
 
@@ -37,7 +37,7 @@ class RecipientController {
     }
     const { id } = req.body;
 
-    const recipient = await Recipient.findByPk(id);
+    const recipient = await Recipients.findByPk(id);
     if (!recipient) {
       res.status(400).json({ error: 'Destinatario nao encontrado' });
     }
