@@ -4,6 +4,8 @@ import Deliverymen from '../models/Deliverymen';
 import Recipients from '../models/Recipients';
 import Files from '../models/Files';
 
+import Mail from '../../lib/Mail';
+
 class DeliveryController {
   async store(req, res) {
     const schema = Yup.object().shape({
@@ -36,6 +38,46 @@ class DeliveryController {
     }
 
     const delivery = await Deliveries.create(req.body);
+
+    const deliverymanEmail = await Deliveries.findByPk(delivery.id, {
+      include: [
+        {
+          model: Deliverymen,
+          as: 'Deliverymen',
+          attributes: ['id', 'email', 'name'],
+        },
+        {
+          model: Recipients,
+          as: 'Recipients',
+          attributes: [
+            'id',
+            'name',
+            'street',
+            'number',
+            'complement',
+            'state',
+            'city',
+            'cep',
+          ],
+        },
+      ],
+    });
+
+    await Mail.sendMail({
+      to: `${deliverymanEmail.Deliverymen.name} <${deliverymanEmail.Deliverymen.email}>`,
+      subject: 'Nova entrega cadastrada para você!',
+      template: 'cancellation',
+      context: {
+        recipient: deliverymanEmail.Recipients.name,
+        deliveryman: deliverymanEmail.Deliverymen.name,
+        street: deliverymanEmail.Recipients.street,
+        number: deliverymanEmail.Recipients.number,
+        complement: deliverymanEmail.Recipients.complement,
+        state: deliverymanEmail.Recipients.state,
+        city: deliverymanEmail.Recipients.city,
+        cep: deliverymanEmail.Recipients.cep,
+      },
+    });
 
     return res.json(delivery);
   }
