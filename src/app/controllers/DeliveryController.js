@@ -4,7 +4,8 @@ import Deliverymen from '../models/Deliverymen';
 import Recipients from '../models/Recipients';
 import Files from '../models/Files';
 
-import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import NewDeliveryMail from '../jobs/NewDeliveryMail';
 
 class DeliveryController {
   async store(req, res) {
@@ -63,20 +64,8 @@ class DeliveryController {
       ],
     });
 
-    await Mail.sendMail({
-      to: `${deliverymanEmail.Deliverymen.name} <${deliverymanEmail.Deliverymen.email}>`,
-      subject: 'Nova entrega cadastrada para você!',
-      template: 'cancellation',
-      context: {
-        recipient: deliverymanEmail.Recipients.name,
-        deliveryman: deliverymanEmail.Deliverymen.name,
-        street: deliverymanEmail.Recipients.street,
-        number: deliverymanEmail.Recipients.number,
-        complement: deliverymanEmail.Recipients.complement,
-        state: deliverymanEmail.Recipients.state,
-        city: deliverymanEmail.Recipients.city,
-        cep: deliverymanEmail.Recipients.cep,
-      },
+    await Queue.add(NewDeliveryMail.key, {
+      deliverymanEmail,
     });
 
     return res.json(delivery);
