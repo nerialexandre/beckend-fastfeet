@@ -9,12 +9,12 @@ class Deliveries extends Model {
         canceled_at: Sequelize.DATE,
         start_date: Sequelize.DATE,
         end_date: Sequelize.DATE,
-        changeable: {
+        alterable: {
           type: Sequelize.VIRTUAL,
           get() {
             return (
               format(new Date(), 'HH:mm:ss') > '08:00:00' &&
-              format(new Date(), 'HH:mm:ss') < '18:00:00'
+              format(new Date(), 'HH:mm:ss') < '22:00:00'
             );
           },
         },

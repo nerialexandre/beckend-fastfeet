@@ -1,11 +1,11 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
-import { startOfDay, endOfDay, format } from 'date-fns';
+import { startOfDay, endOfDay } from 'date-fns';
 import Deliveries from '../models/Deliveries';
 import Recipients from '../models/Recipients';
 import Files from '../models/Files';
 
-class StatusController {
+class StatusDeliveryController {
   async index(req, res) {
     const { page = 1 } = req.query;
     const delivery = await Deliveries.findAll({
@@ -14,7 +14,6 @@ class StatusController {
         deliveryman_id: req.params.id,
         end_date: null,
       },
-      // attributes: ['id', 'product'],
       limit: 10,
       offset: (page - 1) * 10,
       include: [
@@ -46,8 +45,9 @@ class StatusController {
     const { deliverymanId, deliveryId } = req.params;
 
     const schema = Yup.object().shape({
-      start_date: Yup.date(),
-      end_date: Yup.date(),
+      start_date: Yup.boolean(),
+      end_date: Yup.boolean(),
+      signature_id: Yup.boolean(),
     });
 
     if (!schema.isValid(req.body)) {
@@ -73,20 +73,16 @@ class StatusController {
 
     const { start_date, end_date, signature_id } = req.body;
 
-    if (start_date === true) {
-      const dateNow = format(new Date(), 'HH:mm');
-
-      if (dateNow < '08:00' || dateNow > '23:00') {
-        return res
-          .status(400)
-          .json({ error: 'Permitido retirar entregas das 8h as 18h' });
-      }
+    if (start_date === true && delivery.alterable === false) {
+      return res
+        .status(400)
+        .json({ error: 'Permitido retirar entregas apenas das 8h as 18h' });
     }
 
     if (start_date === true && count > 5) {
       return res
         .status(400)
-        .json({ error: 'só é permitido 5 entregas por dia' });
+        .json({ error: 'só é permitido 5 Retiradas por dia' });
     }
 
     if (start_date === true && delivery.start_date !== null) {
@@ -94,7 +90,8 @@ class StatusController {
     }
 
     if (start_date === true && delivery.start_date === null) {
-      await delivery.update({ start_date: new Date() });
+      const deliveryStart = await delivery.update({ start_date: new Date() });
+      return res.json(deliveryStart);
     }
 
     const signature = await Files.findByPk(signature_id);
@@ -125,4 +122,4 @@ class StatusController {
   }
 }
 
-export default new StatusController();
+export default new StatusDeliveryController();
