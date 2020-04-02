@@ -9,7 +9,7 @@ class Deliveries extends Model {
         canceled_at: Sequelize.DATE,
         start_date: Sequelize.DATE,
         end_date: Sequelize.DATE,
-        cancelable: {
+        changeable: {
           type: Sequelize.VIRTUAL,
           get() {
             return (

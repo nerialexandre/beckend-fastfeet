@@ -7,9 +7,11 @@ class DeliverymanController {
       name: Yup.string().required(),
       email: Yup.string().required(),
     });
+
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Preencha o formulario' });
     }
+
     const CheckDeliveryman = await Deliverymen.findOne({
       where: {
         email: req.body.email,
