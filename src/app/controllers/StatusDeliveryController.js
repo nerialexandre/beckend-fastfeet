@@ -54,15 +54,7 @@ class StatusDeliveryController {
       return res.status(400).json({ error: 'Preencha corretamente' });
     }
 
-    const delivery = await Deliveries.findByPk(deliveryId, {
-      where: { deliveryman_id: deliverymanId, canceled_at: null },
-    });
-
-    if (!delivery) {
-      return res.status(400).json({ error: 'entrega nao foi encontrada' });
-    }
-
-    const count = await Deliveries.findAndCountAll({
+    const { count } = await Deliveries.findAndCountAll({
       where: {
         deliveryman_id: deliverymanId,
         start_date: {
@@ -70,55 +62,72 @@ class StatusDeliveryController {
         },
       },
     });
+    console.log(count);
 
     const { start_date, end_date, signature_id } = req.body;
 
-    if (start_date === true && delivery.alterable === false) {
-      return res
-        .status(400)
-        .json({ error: 'Permitido retirar entregas apenas das 8h as 18h' });
-    }
+    if (start_date === true) {
+      if (count > 5) {
+        return res
+          .status(400)
+          .json({ error: 'só é permitido 5 Retiradas por dia' });
+      }
 
-    if (start_date === true && count > 5) {
-      return res
-        .status(400)
-        .json({ error: 'só é permitido 5 Retiradas por dia' });
-    }
+      const deliveryStart = await Deliveries.findOne({
+        where: {
+          id: deliveryId,
+          deliveryman_id: deliverymanId,
+          canceled_at: null,
+          start_date: null,
+          end_date: null,
+        },
+      });
 
-    if (start_date === true && delivery.start_date !== null) {
-      return res.status(400).json({ error: 'Entrega ja iniciada' });
-    }
+      if (!deliveryStart) {
+        return res.status(400).json({ error: 'entrega nao foi encontrada' });
+      }
 
-    if (start_date === true && delivery.start_date === null) {
-      const deliveryStart = await delivery.update({ start_date: new Date() });
+      if (deliveryStart.alterable === false) {
+        return res.status(400).json({ error: 'Retirar apenas de 8h as 18h' });
+      }
+
+      await deliveryStart.update({ start_date: new Date() });
       return res.json(deliveryStart);
     }
 
-    const signature = await Files.findByPk(signature_id);
-    if (!signature) {
-      return res.status(400).json({ error: 'Assinatura nao localizada' });
-    }
+    if (end_date === true) {
+      const signature = await Files.findByPk(signature_id);
 
-    if (
-      (end_date === true && delivery.start_date === null) ||
-      (end_date === true && delivery.end_date !== null) ||
-      (end_date === true && delivery.signature_id !== null)
-    ) {
-      return res.status(400).json({ error: 'Entrega nao pode ser finalizada' });
-    }
+      if (!signature) {
+        return res.status(400).json({ error: 'Assinatura nao localizada' });
+      }
 
-    if (
-      end_date === true &&
-      delivery.start_date !== null &&
-      delivery.end_date === null
-    ) {
-      await delivery.update({
+      const deliveryEnd = await Deliveries.findOne({
+        where: {
+          id: deliveryId,
+          deliveryman_id: deliverymanId,
+          end_date: null,
+          canceled_at: null,
+          start_date: {
+            [Op.ne]: null,
+          },
+        },
+      });
+      console.log(deliveryEnd);
+
+      if (!deliveryEnd) {
+        return res.status(400).json({ error: 'Entrega nao foi encontrada' });
+      }
+
+      await deliveryEnd.update({
         end_date: new Date(),
         signature_id: signature.id,
       });
+
+      return res.json(deliveryEnd);
     }
 
-    return res.json(delivery);
+    return res.json();
   }
 }
 

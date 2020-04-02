@@ -74,8 +74,8 @@ class DeliveryController {
   async index(req, res) {
     const { page = 1 } = req.query;
     const delivery = await Deliveries.findAll({
-      where: { canceled_at: null },
-      attributes: ['id', 'product', 'canceled_at'],
+      order: ['created_at'],
+      attributes: ['id', 'product', 'canceled_at', 'alterable'],
       limit: 10,
       offset: (page - 1) * 10,
       include: [
